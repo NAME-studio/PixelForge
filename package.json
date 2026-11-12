@@ -1,0 +1,55 @@
+{
+  "name": "pixelforge",
+  "version": "1.0.0",
+  "description": "PixelForge - редактор пиксель-арта",
+  "main": "main.js",
+  "author": "MultiTool",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "icon": "node tools/make-icon.js",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.multitool.pixelforge",
+    "productName": "PixelForge",
+    "asar": true,
+    "npmRebuild": false,
+    "compression": "maximum",
+    "electronLanguages": [
+      "ru",
+      "en-US"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "style.css",
+      "renderer.js",
+      "build/icon.ico"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "PixelForge-${version}-portable.exe"
+    }
+  }
+}

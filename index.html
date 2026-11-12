@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>PixelForge</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>PixelForge</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn size-btn" id="newBtn" title="Новый холст и разрешение (Ctrl+N)">Холст 32 × 32</button>
+        <button class="btn" id="openBtn" title="Открыть проект (Ctrl+O)">Открыть</button>
+        <button class="btn" id="saveBtn" title="Сохранить проект (Ctrl+S)">Сохранить</button>
+        <button class="icon-btn" id="undoBtn" title="Отменить (Ctrl+Z)">↶</button>
+        <button class="icon-btn" id="redoBtn" title="Повторить (Ctrl+Shift+Z)">↷</button>
+        <span class="divider"></span>
+        <label class="scale-pick">
+          <span>Масштаб</span>
+          <select id="exportScale">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+            <option value="8">8x</option>
+            <option value="16">16x</option>
+          </select>
+        </label>
+        <button class="btn primary" id="exportBtn" title="Экспорт PNG (Ctrl+E)">Экспорт PNG</button>
+        <button class="icon-btn" id="helpBtn" title="Горячие клавиши">?</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <aside class="sidebar">
+        <section class="group">
+          <h2 class="group-title">Инструменты</h2>
+          <div class="tool-grid" id="tools">
+            <button class="tool active" data-tool="pencil" title="Карандаш (B)">
+              <svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M14.5 6.5l3 3"/></svg>
+              <span>Карандаш</span>
+            </button>
+            <button class="tool" data-tool="eraser" title="Ластик (E)">
+              <svg viewBox="0 0 24 24"><path d="M8 20h11"/><path d="M16.5 4.5l3 3a2 2 0 0 1 0 2.8L11 18.8a2 2 0 0 1-2.8 0l-3-3a2 2 0 0 1 0-2.8l8.5-8.5a2 2 0 0 1 2.8 0z"/><path d="M9 9l6 6"/></svg>
+              <span>Ластик</span>
+            </button>
+            <button class="tool" data-tool="fill" title="Заливка (G)">
+              <svg viewBox="0 0 24 24"><path d="M5 11l6-6 7 7-6 6-7-7z"/><path d="M9 3l2 2"/><path d="M19 15c0 1.7 1 2.6 1 3.5a1.6 1.6 0 0 1-3.2 0c0-.9 1-1.8 1-3.5z"/></svg>
+              <span>Заливка</span>
+            </button>
+            <button class="tool" data-tool="picker" title="Пипетка (I)">
+              <svg viewBox="0 0 24 24"><path d="M14 4l6 6"/><path d="M17 7l-9 9-4 1 1-4 9-9z"/><path d="M12.5 8.5l3 3"/></svg>
+              <span>Пипетка</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2 class="group-title">Цвет</h2>
+          <div class="current-color">
+            <label class="swatch-big" for="colorInput" id="colorSwatch"></label>
+            <div class="current-color-info">
+              <input id="colorInput" type="text" spellcheck="false" maxlength="7" value="#FF4D6D" />
+              <span class="hint" id="colorHint">HEX</span>
+            </div>
+            <input id="nativeColor" type="color" value="#ff4d6d" />
+          </div>
+          <div class="palette" id="palette"></div>
+          <div class="recent" id="recent"></div>
+        </section>
+
+        <section class="group">
+          <h2 class="group-title">Холст</h2>
+          <div class="mini-grid">
+            <button class="btn small" id="flipHBtn" title="Отразить по горизонтали">Отразить ↔</button>
+            <button class="btn small" id="flipVBtn" title="Отразить по вертикали">Отразить ↕</button>
+            <button class="btn small span2" id="clearBtn" title="Очистить холст (можно отменить)">Очистить холст</button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2 class="group-title">Вид</h2>
+          <div class="mini-grid view-grid">
+            <button class="btn small" id="zoomOutBtn" title="Уменьшить (-)">−</button>
+            <span class="zoom-value" id="zoomValue">x16</span>
+            <button class="btn small" id="zoomInBtn" title="Увеличить (+)">+</button>
+            <button class="btn small span2" id="fitBtn" title="Вписать в окно (0)">Вписать в окно</button>
+            <button class="btn small span2" id="gridBtn" title="Сетка (Ctrl+G)">Сетка: вкл</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="workspace" id="workspace">
+        <canvas id="canvas"></canvas>
+        <div class="workspace-hint" id="hint">
+          ЛКМ — рисовать · ПКМ — стирать · колесо — зум · средняя кнопка или пробел — панорама
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span id="sizeStatus">32 x 32</span>
+      <span class="dot"></span>
+      <span id="zoomStatus">x16</span>
+      <span class="dot"></span>
+      <span id="coordStatus">—, —</span>
+      <span class="spacer"></span>
+      <span id="nameStatus">pixel-art</span>
+    </footer>
+  </div>
+
+  <div class="modal-backdrop hidden" id="newModal">
+    <div class="modal-card">
+      <h3>Разрешение холста</h3>
+      <p class="modal-text">Ширина и высота в пикселях. Для мелких спрайтов берите 8–32. Текущий рисунок не переносится — сохраните проект заранее.</p>
+      <div class="field-row">
+        <label class="field">
+          <span>Ширина</span>
+          <input id="newWidth" type="number" min="1" max="512" value="32" />
+        </label>
+        <label class="field">
+          <span>Высота</span>
+          <input id="newHeight" type="number" min="1" max="512" value="32" />
+        </label>
+      </div>
+      <div class="presets" id="presets">
+        <button class="preset" data-size="8">8</button>
+        <button class="preset" data-size="16">16</button>
+        <button class="preset" data-size="24">24</button>
+        <button class="preset" data-size="32">32</button>
+        <button class="preset" data-size="48">48</button>
+        <button class="preset" data-size="64">64</button>
+        <button class="preset" data-size="128">128</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="newCancel">Отмена</button>
+        <button class="btn primary" id="newCreate">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="helpModal">
+    <div class="modal-card wide">
+      <h3>Горячие клавиши</h3>
+      <div class="keys">
+        <div><kbd>B</kbd><span>Карандаш</span></div>
+        <div><kbd>E</kbd><span>Ластик</span></div>
+        <div><kbd>G</kbd><span>Заливка</span></div>
+        <div><kbd>I</kbd><span>Пипетка</span></div>
+        <div><kbd>Ctrl</kbd><kbd>Z</kbd><span>Отменить</span></div>
+        <div><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd><span>Повторить</span></div>
+        <div><kbd>Ctrl</kbd><kbd>S</kbd><span>Сохранить проект</span></div>
+        <div><kbd>Ctrl</kbd><kbd>O</kbd><span>Открыть проект</span></div>
+        <div><kbd>Ctrl</kbd><kbd>E</kbd><span>Экспорт PNG</span></div>
+        <div><kbd>Ctrl</kbd><kbd>N</kbd><span>Новый холст</span></div>
+        <div><kbd>+</kbd><kbd>−</kbd><span>Зум</span></div>
+        <div><kbd>0</kbd><span>Вписать в окно</span></div>
+        <div><kbd>Ctrl</kbd><kbd>G</kbd><span>Сетка</span></div>
+        <div><kbd>Alt</kbd><span>+ клик — пипетка</span></div>
+        <div><kbd>Пробел</kbd><span>Панорама</span></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="helpClose">Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
